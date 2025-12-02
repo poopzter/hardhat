@@ -135,3 +135,4 @@ hardhat.config.js
 /ignition
 /scripts
 /test
+publish.sh

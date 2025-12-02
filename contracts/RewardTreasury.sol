@@ -9,7 +9,7 @@ interface IPoints {
     function mint(address account, uint256 amount) external;
 }
 
-contract PoopTreasury is AccessControl, IPoints {
+contract RewardTreasury is AccessControl, IPoints {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     IERC20 public poopToken;
 
@@ -22,6 +22,7 @@ contract PoopTreasury is AccessControl, IPoints {
         
         poopToken = IERC20(_poopToken);
         _grantRole(DEFAULT_ADMIN_ROLE, _admin);
+        _grantRole(MINTER_ROLE, _admin);
     }
 
     /**
@@ -37,9 +38,9 @@ contract PoopTreasury is AccessControl, IPoints {
      * Requires MINTER_ROLE.
      */
     function mint(address account, uint256 amount) external override onlyRole(MINTER_ROLE) {
-        require(poopToken.balanceOf(address(this)) >= amount, "PoopTreasury: Insufficient balance");
+        require(poopToken.balanceOf(address(this)) >= amount, "RewardTreasury: Insufficient balance");
         bool success = poopToken.transfer(account, amount);
-        require(success, "PoopTreasury: Transfer failed");
+        require(success, "RewardTreasury: Transfer failed");
     }
 
     /**
@@ -48,7 +49,7 @@ contract PoopTreasury is AccessControl, IPoints {
      */
     function deposit(uint256 amount) external {
         bool success = poopToken.transferFrom(msg.sender, address(this), amount);
-        require(success, "PoopTreasury: Transfer failed");
+        require(success, "RewardTreasury: Transfer failed");
         emit Deposited(msg.sender, amount);
     }
 
@@ -58,7 +59,7 @@ contract PoopTreasury is AccessControl, IPoints {
     function withdraw(address to, uint256 amount) external onlyRole(DEFAULT_ADMIN_ROLE) {
         require(to != address(0), "Invalid recipient");
         bool success = poopToken.transfer(to, amount);
-        require(success, "PoopTreasury: Transfer failed");
+        require(success, "RewardTreasury: Transfer failed");
         emit Withdrawn(to, amount);
     }
 
